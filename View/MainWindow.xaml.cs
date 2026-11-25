@@ -2,14 +2,9 @@
 using System.IO;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 using Controller;
 
@@ -77,7 +72,8 @@ public partial class MainWindow : Window {
 
         // ustawienie wartości domyślnych
         _controller.SetLightColor(0xFF, 0xFF, 0xFF);
-        _controller.LoadTexture("bricks.png");
+        string texturePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "bricks.png");
+        _controller.LoadTexture(texturePath);
 
         // Obsługa skrótów klawiszowych
         KeyDown += (_, e) => {
