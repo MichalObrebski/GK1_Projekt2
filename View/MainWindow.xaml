@@ -1,0 +1,184 @@
+﻿<Window x:Class="View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowState="Maximized"
+        Title="Projekt 2"
+        Height="720"
+        Width="1280">
+
+        <Window.Resources>
+                <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
+        </Window.Resources>
+
+        <DockPanel>
+
+                <!-- Menu główne -->
+                <Menu DockPanel.Dock="Top">
+                        <MenuItem Header="Plik">
+                                <MenuItem Header="Wczytaj teksturę z pliku"
+                                          Click="LoadTextureFromFile"/>
+                                <MenuItem Header="Wczytaj mapę wektorów normalnych"
+                                          Click="LoadNormalVectorsMapFromFile"/>
+                        </MenuItem>
+                        <MenuItem Header="Kolory">
+                                <MenuItem Header="Wybierz jednolity kolor obiektu"
+                                          Click="SelectObjectColor"/>
+                                <MenuItem Header="Wybierz kolor padającego światła"
+                                          Click="SelectLightColor"/>
+                        </MenuItem>
+                        <MenuItem Header="Pomoc">
+                                <MenuItem Header="Instrukcja obsługi"
+                                          Click="ShowInstructions"/>
+                        </MenuItem>
+                </Menu>
+
+                <!-- Panele sterowania -->
+                <StackPanel DockPanel.Dock="Top"
+                            Orientation="Vertical"
+                            Margin="10">
+                        <StackPanel.Resources>
+                                <!-- Pogrubianie RadioButtonów -->
+                                <Style TargetType="RadioButton">
+                                        <Setter Property="FontWeight"
+                                                Value="Normal"/>
+                                        <Style.Triggers>
+                                                <Trigger Property="IsChecked"
+                                                         Value="True">
+                                                        <Setter Property="FontWeight"
+                                                                Value="Bold"/>
+                                                </Trigger>
+                                        </Style.Triggers>
+                                </Style>
+                        </StackPanel.Resources>
+                        <!-- Sterowanie widocznością sekcji -->
+                        <StackPanel Orientation="Horizontal">
+                                <RadioButton x:Name="VisibilitySectionRadio"
+                                             GroupName="SectionRadios"
+                                             Content="Opcje renderowania sceny"
+                                             IsChecked="True"/>
+                                <RadioButton x:Name="MaterialSectionRadio"
+                                             GroupName="SectionRadios"
+                                             Content="Właściwości powierzchni obiektu:"/>
+                                <RadioButton x:Name="LightingSectionRadio"
+                                             GroupName="SectionRadios"
+                                             Content="Parametry oświetlenia i źródła światła:"/>
+                        </StackPanel>
+
+                        <!-- SEKCJA 1: RYSOWANIE I WIDOCZNOŚĆ -->
+                        <StackPanel Orientation="Horizontal"
+                                    Visibility="{Binding ElementName=VisibilitySectionRadio, Path=IsChecked, Converter={StaticResource BoolToVisConverter}}">
+                                <CheckBox Content="Pokaż wieloboki kontrolne Béziera  "
+                                          IsChecked="True"
+                                          VerticalAlignment="Center"
+                                          Checked="ShowBezierPolygonChecked"
+                                          Unchecked="ShowBezierPolygonUnchecked"/>
+                                <CheckBox Content="Pokaż siatkę trójkątów   "
+                                          IsChecked="True"
+                                          VerticalAlignment="Center"
+                                          Checked="ShowGridChecked"
+                                          Unchecked="ShowGridUnchecked"/>
+                                <CheckBox Content="Pokaż wypełnienie trójkątów  "
+                                          IsChecked="True"
+                                          VerticalAlignment="Center"
+                                          Checked="FillTrianglesChecked"
+                                          Unchecked="FillTrianglesUnchecked"/>
+
+                                <TextBlock Text="   Dokładność podziału siatki (N): "
+                                           VerticalAlignment="Center"/>
+                                <Slider Width="120"
+                                        Minimum="1"
+                                        Maximum="50"
+                                        Value="4"
+                                        VerticalAlignment="Center"
+                                        IsSnapToTickEnabled="True"
+                                        TickFrequency="1"
+                                        ValueChanged="GridResolutionChanged"/>
+                        </StackPanel>
+
+                        <!-- SEKCJA 2: WYPEŁNIENIE I MATERIAŁ -->
+                        <StackPanel Orientation="Horizontal"
+                                    Visibility="{Binding ElementName=MaterialSectionRadio, Path=IsChecked, Converter={StaticResource BoolToVisConverter}}">
+                                <TextBlock Text="Tryb wypełnienia: "
+                                           VerticalAlignment="Center"/>
+                                <RadioButton x:Name="SolidColorRadio"
+                                             Content="Jednolity kolor  "
+                                             GroupName="FillMode"
+                                             VerticalAlignment="Center"
+                                             Checked="SetFillModeSolidColor"/>
+                                <RadioButton x:Name="TextureRadio"
+                                             Content="Tekstura z pliku obrazu  "
+                                             GroupName="FillMode"
+                                             IsChecked="True"
+                                             VerticalAlignment="Center"
+                                             Checked="SetFillModeTexture"/>
+
+                                <TextBlock Text="   Dodatkowe mapowanie: "
+                                           VerticalAlignment="Center"/>
+                                <CheckBox Content="Użyj mapy wektorów normalnych"
+                                          VerticalAlignment="Center"
+                                          Checked="SetNormalVectorsMapUsageChecked"
+                                          Unchecked="SetNormalVectorsMapUsageUnchecked"/>
+                        </StackPanel>
+
+                        <!-- SEKCJA 3: OŚWIETLENIE I ANIMACJA -->
+                        <StackPanel Orientation="Horizontal"
+                                    Visibility="{Binding ElementName=LightingSectionRadio, Path=IsChecked, Converter={StaticResource BoolToVisConverter}}">
+                                <TextBlock Text="Rozproszenie (kd): "
+                                           VerticalAlignment="Center"/>
+                                <Slider Width="80"
+                                        Minimum="0"
+                                        Maximum="1"
+                                        Value="0.5"
+                                        VerticalAlignment="Center"
+                                        ValueChanged="SetKdValue"/>
+
+                                <TextBlock Text="   Zwierciadło (ks): "
+                                           VerticalAlignment="Center"/>
+                                <Slider Width="80"
+                                        Minimum="0"
+                                        Maximum="1"
+                                        Value="0.5"
+                                        VerticalAlignment="Center"
+                                        ValueChanged="SetKsValue"/>
+
+                                <TextBlock Text="   Połysk (m): "
+                                           VerticalAlignment="Center"/>
+                                <Slider Width="80"
+                                        Minimum="1"
+                                        Maximum="100"
+                                        Value="50"
+                                        IsSnapToTickEnabled="True"
+                                        TickFrequency="1"
+                                        VerticalAlignment="Center"
+                                        ValueChanged="SetMValue"/>
+
+                                <TextBlock Text="   Wysokość światła (Z): "
+                                           VerticalAlignment="Center"/>
+                                <Slider Width="80"
+                                        Minimum="-3"
+                                        Maximum="3"
+                                        Value="1.5"
+                                        VerticalAlignment="Center"
+                                        ValueChanged="SetLightHeightValue"/>
+
+                                <CheckBox x:Name="ToggleLightAnimationCheckBox"
+                                        Content=" Odtwarzaj animację światła "
+                                        VerticalAlignment="Center"
+                                        Checked="ToggleLightAnimationChecked"
+                                        Unchecked="ToggleLightAnimationUnchecked"/>
+                        </StackPanel>
+
+                </StackPanel>
+
+                <!-- Płótno (Bitmapa) -->
+                <Grid x:Name="ScreenGrid"
+                      Background="LightGray">
+                        <Image x:Name="ScreenImage"
+                               Stretch="None"
+                               MouseDown="ScreenImage_MouseDown"
+                               MouseMove="ScreenImage_MouseMove"
+                               MouseUp="ScreenImage_MouseUp"/>
+                </Grid>
+
+        </DockPanel>
+</Window>
